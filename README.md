@@ -48,7 +48,7 @@ flowchart LR
 2. [02 — Claude Code](docs/02-claude-code.md) — the product coder
 3. [03 — OpenCode](docs/03-opencode.md) — the open coder
 4. [04 — Antigravity CLI](docs/04-antigravity.md) — the platform agent
-5. [05 — Comparison & competition](docs/05-comparison.md) — where they fight
+5. [05 — Comparison & competition](docs/05-comparison.md) — where they fight + the **two-lens decision guide** (individual vs enterprise)
 6. [06 — Complementary patterns](docs/06-complementary.md) — how to run them together (the reference stack)
 7. [07 — Mixing antipatterns](docs/07-antipatterns.md) — what breaks when you don't
 

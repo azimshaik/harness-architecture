@@ -35,22 +35,52 @@ Where the four fight, and who wins each fight.
 - **"Run the same agent on whatever model is cheapest today, including free previews and local"** → OpenCode.
 - **"One agent harness across my terminal, IDE, desktop, and a browser recorder, managed by Google"** → Antigravity.
 
-## Decision guide
+## Decision guide — two lenses, opposite rules
+
+The naive question — *"which model do I want, then which harness runs it?"* — is 2024 thinking. Models have decoupled from harnesses: OpenCode runs Claude and Gemini by key; vendor harnesses (Claude Code ↔ Anthropic, Antigravity ↔ Google) are *products*, not model transports. The real decision variables differ by context — and the individual and the enterprise follow **opposite rules**.
+
+### Lens 1 — Individual practitioner (cost → control → coupling → model dial)
 
 ```mermaid
 flowchart TD
-    START["Pick a harness"] --> Q1{"Job class?"}
-    Q1 -->|"life/ops assistant,<br/>chat control, schedules"| H["Hermes Agent"]
-    Q1 -->|"coding in a repo"| Q2{"Which model?"}
-    Q2 -->|"Claude (sub or API)"| CC["Claude Code"]
-    Q2 -->|"Gemini only / platform"| AG["Antigravity"]
-    Q2 -->|"any / cheapest / local"| OC["OpenCode"]
-    Q2 -->|"want all of the above"| MIX["Run them together<br/>see 06"]
-    H --> DONE["Done"]
-    CC --> DONE
-    AG --> DONE
-    OC --> DONE
-    MIX --> DONE
+    A["Pick a coding harness"] --> B{"Cost structure?"}
+    B -->|"already pay a subscription<br/>(Claude Pro / credits)"| P["Vendor product wins<br/>(marginal cost ≈ $0)"]
+    B -->|"BYO tokens / cheap + local"| O["Open harness wins<br/>(OpenCode class)"]
+    P --> C{"Control needs?"}
+    O --> C
+    C -->|"hooks, gate every step"| H["prefer hook-rich product"]
+    C -->|"agents-as-config, LSP"| AG["prefer open tool"]
+    C -->|"enterprise policy"| E["prefer platform tier"]
+    H & AG & E --> D["Coupling tolerance?"]
+    D -->|"accept vendor polish"| V["product (CC / Antigravity)"]
+    D -->|"keep freedom"| F["open (OpenCode)"]
+    V --> M["Model = per-task dial<br/>inside the harness"]
+    F --> M
 ```
+
+**Rules of this lens:** economics and control pick the *platform*; the model is a per-task dial *within* it (swap cheap/frontier/local per task); the harness is a platform decision you make once per repo — the orchestrator routes tasks, it never re-litigates the harness.
+
+### Lens 2 — Enterprise (governance → procurement → platform → catalog → ergonomics last)
+
+```mermaid
+flowchart TD
+    A["Adopt an agent harness"] --> B{"Data classification"}
+    B -->|"public code / IP"| C1["standard contracts"]
+    B -->|"PII / PHI / PCI / regulated"| C2["restricted vendor contracts<br/>+ residency + DLP"]
+    C1 & C2 --> D{"Regulatory checklist"}
+    D -->|"SSO · audit · HITL ·<br/>retention · model inventory"| OK["pass = eligible"]
+    OK --> E{"Platform standardization"}
+    E -->|"existing cloud / agent platform"| F["harness rides the platform<br/>(Vertex · Azure · Bedrock +<br/>sanctioned agent tooling)"]
+    F --> G["Approved model catalog<br/>(2–5 models, risk-tiered)"]
+    G --> H["Dev ergonomics —<br/>last, within the approved set"]
+```
+
+**Rules of this lens:** governance and procurement decide *everything — the model included*. Freedom is shadow-AI risk; vendor coupling is accountability (SLA, support, indemnification); the model set is a governed catalog routed through a central gateway, not a per-developer dial; decisions are made once at the architecture review board and change through change management.
+
+### Why the model diamond is obsolete (and when it still holds)
+- **Obsolete:** "want Claude → Claude Code" assumes the harness is the model's only transport. It isn't — any OpenAI-compatible harness runs any model by key.
+- **Still holds when:** you're spending a *subscription* (OAuth works only inside the vendor product — marginal cost ≈ $0 makes it the rational pick), or you need the vendor's *best integration* (Anthropic hooks + Opus; Google browser recorder + Gemini), or you're in an enterprise where the *catalog* (not the developer) decides the model anyway.
+
+**The uncomfortable truth:** the individual pattern (try anything, dial per task) is precisely the behavior enterprise governance exists to contain. Two lenses, opposite rules — both correct in their domain.
 
 **The honest summary:** the three coders compete in a triangle on the same turf; Hermes isn't in that turf at all — it's the orchestrator layer *above* it. Treating Hermes as "another coding agent" (or expecting a coding agent to be your life assistant) is the category error this repo exists to prevent.
