@@ -51,6 +51,9 @@ flowchart LR
 5. [05 — Comparison & competition](docs/05-comparison.md) — where they fight + the **two-lens decision guide** (individual vs enterprise)
 6. [06 — Complementary patterns](docs/06-complementary.md) — how to run them together (the reference stack)
 7. [07 — Mixing antipatterns](docs/07-antipatterns.md) — what breaks when you don't
+8. [08 — How to actually choose](docs/08-decision-guide.md) — **start here if you came to decide** (personas, verdicts, kickstarts)
+
+> **New here and short on time? Skip straight to [08](docs/08-decision-guide.md).**
 
 Every doc follows the same anatomy: **loop → context → tools → memory → extension model → control → cost → unique moves → failure modes** — so you can compare like-for-like.
 
