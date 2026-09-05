@@ -4,21 +4,34 @@ The four aren't just comparable — they compose. This is the architecture this 
 
 ## The reference stack: gateway-orchestrator + repo agents
 
-```
-                    ┌─────────────────────────────┐
-  Telegram/phone ──▶│  HERMES (orchestrator)      │
-  chat, voice,      │  - memory, cron, skills     │
-  files, schedules  │  - cost metering            │
-                    │  - the "interface brain"    │
-                    └──────┬──────────────────────┘
-                           │ delegate (task, repo, budget)
-              ┌────────────┼──────────────┬───────────────┐
-              ▼            ▼              ▼               ▼
-       ┌────────────┐ ┌───────────┐ ┌───────────┐ ┌──────────────┐
-       │Claude Code │ │ OpenCode  │ │Antigravity│ │  subagents   │
-       │(Claude sub,│ │ (cheap/   │ │  (Gemini, │ │ (hermes-side │
-       │ deep code) │ │  free m.) │ │  browser) │ │  parallel)   │
-       └────────────┘ └───────────┘ └───────────┘ └──────────────┘
+```mermaid
+flowchart LR
+    subgraph You["You"]
+        T["Telegram / phone<br/>chat · voice · files"]
+    end
+    subgraph H["Hermes — orchestrator"]
+        MEM[("memory + skills")]
+        CRON["cron"]
+        META["cost ledger"]
+        DECIDE["task routing"]
+    end
+    subgraph Hands["Repo agents (execute in their lane)"]
+        CC["Claude Code<br/>Claude sub · deep code"]
+        OC["OpenCode<br/>cheap/free models"]
+        AG["Antigravity<br/>Gemini · browser"]
+        SUB["Hermes subagents<br/>parallel research"]
+    end
+    T --> H
+    MEM --> DECIDE
+    CRON --> DECIDE
+    DECIDE -->|"task brief"| CC
+    DECIDE -->|"task brief"| OC
+    DECIDE -->|"task brief"| AG
+    DECIDE --> SUB
+    CC --> META
+    OC --> META
+    AG --> META
+    SUB --> META
 ```
 
 **Division of labor:**
@@ -27,6 +40,27 @@ The four aren't just comparable — they compose. This is the architecture this 
 - **OpenCode** gets: model experiments, cheap bulk, local/private work (any model).
 - **Antigravity** gets: anything needing Gemini/browser recording/platform continuity.
 - **Hermes subagents** get: parallel research/verification that shouldn't pollute the main context.
+
+### The flagship recipe: research → implement → verify
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as You (Telegram)
+    participant H as Hermes
+    participant R as Research subagent
+    participant CC as Claude Code
+    participant OC as OpenCode
+    U->>H: "ship feature X, research first"
+    H->>R: research task (isolated context)
+    R-->>H: findings summary
+    H->>CC: implement X (task brief, repo)
+    CC->>CC: edits + tests (hooks gate)
+    CC-->>H: diff + test results
+    H->>OC: review on cheap model
+    OC-->>H: review verdict
+    H-->>U: summary + next step
+```
 
 ## Routing rules that make it work
 

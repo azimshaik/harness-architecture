@@ -4,6 +4,62 @@
 **Model coupling:** Claude family (via subscription OAuth or API key)
 **One-liner:** the product-grade coding agent — the reference implementation of "an agent that lives inside your repository."
 
+## Architecture at a glance
+
+```mermaid
+flowchart LR
+    subgraph Repo["Your repository (cwd)"]
+        CODE["Source tree"]
+        MD["CLAUDE.md hierarchy<br/>repo conventions"]
+        AG["AGENTS.md"]
+    end
+    subgraph CC["Claude Code session"]
+        TUI["TUI / headless (-p)"]
+        CORE["Agent loop"]
+        PERM["Permission system"]
+        HOOKS["Hooks<br/>(Pre/Post tool use, Stop...)"]
+        SUB["Subagents<br/>(forked contexts)"]
+        MCP["MCP servers"]
+        SK["Skills"]
+    end
+    subgraph Models["Anthropic"]
+        OP["Claude (Opus/Sonnet)<br/>subscription OAuth or API"]
+    end
+    CODE --> CORE
+    MD --> CORE
+    AG --> CORE
+    CORE --> PERM
+    HOOKS -.-> CORE
+    CORE --> SUB
+    CORE --> MCP
+    CORE -.-> SK
+    CORE <--> OP
+    TUI <--> CORE
+```
+
+### Hook lifecycle on one tool call
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant M as Model
+    participant H as Hook runner
+    participant P as Permission system
+    participant T as Tool (bash/edit)
+    M->>H: proposes tool call
+    H->>H: PreToolUse hooks
+    alt hook blocks
+        H-->>M: block + reason
+    else hook approves / passes
+        H->>P: permission check
+        P-->>H: allow / deny / ask
+        H->>T: execute
+        T-->>H: result
+        H->>H: PostToolUse hooks (can rewrite result)
+        H-->>M: observation
+    end
+```
+
 ## Architectural stance
 Claude Code is **repo-centric to the bone**. It boots in a working directory, treats the repo as the unit of work, and reads a hierarchy of instruction files (`CLAUDE.md` at repo root + subdirectories) to ground itself. Its job is software engineering in place: read the code, plan, edit, run tests, commit. It is a *product* — tightly integrated with Anthropic models, with polish (permissions UX, plan mode, diffs) that open tools struggle to match.
 

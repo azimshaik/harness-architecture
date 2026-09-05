@@ -35,4 +35,22 @@ Where the four fight, and who wins each fight.
 - **"Run the same agent on whatever model is cheapest today, including free previews and local"** → OpenCode.
 - **"One agent harness across my terminal, IDE, desktop, and a browser recorder, managed by Google"** → Antigravity.
 
+## Decision guide
+
+```mermaid
+flowchart TD
+    START["Pick a harness"] --> Q1{"Job class?"}
+    Q1 -->|"life/ops assistant,<br/>chat control, schedules"| H["Hermes Agent"]
+    Q1 -->|"coding in a repo"| Q2{"Which model?"}
+    Q2 -->|"Claude (sub or API)"| CC["Claude Code"]
+    Q2 -->|"Gemini only / platform"| AG["Antigravity"]
+    Q2 -->|"any / cheapest / local"| OC["OpenCode"]
+    Q2 -->|"want all of the above"| MIX["Run them together<br/>see 06"]
+    H --> DONE["Done"]
+    CC --> DONE
+    AG --> DONE
+    OC --> DONE
+    MIX --> DONE
+```
+
 **The honest summary:** the three coders compete in a triangle on the same turf; Hermes isn't in that turf at all — it's the orchestrator layer *above* it. Treating Hermes as "another coding agent" (or expecting a coding agent to be your life assistant) is the category error this repo exists to prevent.

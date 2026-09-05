@@ -34,5 +34,26 @@ Buying the pitch that one harness does it all → a repo agent asked to manage y
 Skills written for Claude Code silently ignored by OpenCode (or vice versa) because the folder conventions differ — or duplicated skills drifting apart.
 **Rule:** use the interoperable Agent Skills format where possible; one skill library, loaded by whichever harness runs the task.
 
+## The shape of a healthy setup
+
+```mermaid
+flowchart LR
+    subgraph Brain["One brain"]
+        O["Orchestrator<br/>decides + remembers + meters"]
+    end
+    subgraph Hands["Many hands"]
+        A1["Agent A<br/>(repo 1 worktree)"]
+        A2["Agent B<br/>(repo 2 worktree)"]
+        A3["Agent C<br/>(headless batch)"]
+    end
+    L["Single ledger<br/>every call metered"]
+    O -->|"one agent per worktree"| A1
+    O -->|"one agent per worktree"| A2
+    O -->|"one agent per worktree"| A3
+    A1 --> L
+    A2 --> L
+    A3 --> L
+```
+
 ## The one-sentence philosophy
 > **One brain, many hands, single ledger** — one orchestrator decides and remembers, dedicated agents execute in their lane, and every action is metered in one place. Anything that violates that (two brains, two editors, two memory stores) is an antipattern.

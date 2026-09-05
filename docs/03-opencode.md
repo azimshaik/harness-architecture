@@ -4,6 +4,50 @@
 **Model coupling:** none — any model via any provider (OpenRouter, OpenAI-compatible endpoints, local)
 **One-liner:** the open, provider-agnostic coding agent — Claude Code's architecture without the lock-in.
 
+## Architecture at a glance
+
+```mermaid
+flowchart LR
+    subgraph Providers["Providers (BYO)"]
+        OR["OpenRouter<br/>(catalog: cheap + free +<br/>1M-context models)"]
+        ANY["Any OpenAI-compatible<br/>endpoint"]
+        LOC["Local Ollama / llama.cpp"]
+    end
+    subgraph OC["OpenCode"]
+        TUI["TUI / headless run"]
+        CORE["Agent loop"]
+        AGT["Agents<br/>(named configs: prompt + model)"]
+        LSP["LSP integration"]
+        MCP["MCP servers"]
+        SK["Skills (SKILL.md)"]
+    end
+    subgraph Repo["Repository"]
+        R["AGENTS.md<br/>source of truth"]
+        S["Source tree"]
+    end
+    OR & ANY & LOC --> CORE
+    TUI <--> CORE
+    AGT --> CORE
+    CORE --> LSP
+    CORE --> MCP
+    CORE -.-> SK
+    R --> CORE
+    S --> CORE
+```
+
+### Per-task model routing
+
+```mermaid
+flowchart TD
+    Q["Task arrives"] --> C{Complexity?}
+    C -->|"mechanical / bulk"| CHEAP["cheap model<br/>(flash class)"]
+    C -->|"hard reasoning"| FRON["frontier model<br/>(opus class)"]
+    C -->|"private / offline"| LOCM["local model"]
+    CHEAP --> OUT["done"]
+    FRON --> OUT
+    LOCM --> OUT
+```
+
 ## Architectural stance
 OpenCode is what you get when you take the "terminal coding agent that lives in your repo" shape and make it fully open and model-agnostic. It speaks the same language as Claude Code (repo-rooted sessions, permission-gated tools, `AGENTS.md` context) but treats the model as a pluggable resource: your DeepSeek key, your local Ollama model, an OpenRouter catalog model — any OpenAI-compatible endpoint. If Claude Code is the iPhone, OpenCode is Android: you accept less polish, you gain freedom and ownership.
 

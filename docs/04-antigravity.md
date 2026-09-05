@@ -4,6 +4,38 @@
 **Model coupling:** Gemini family (credits-based; enterprise auth)
 **One-liner:** the terminal surface of Google's *shared agent harness* — the same agent core that powers Antigravity 2.0 desktop, IDEs, and SDKs. Successor to Gemini CLI.
 
+## Architecture at a glance
+
+```mermaid
+flowchart LR
+    subgraph Surfaces["Surfaces (one shared agent core)"]
+        CLI["Antigravity CLI<br/>lightweight TUI"]
+        DSK["Antigravity 2.0<br/>visual desktop editor"]
+        IDE["IDE extensions<br/>VS Code · JetBrains · Zed · Xcode"]
+        BR["Browser<br/>recordings + isolated profile"]
+    end
+    subgraph Harness["Shared agent harness"]
+        CORE["Agent core<br/>reasoning · tools · multi-file edit"]
+        SYNC["Settings / permissions sync"]
+        EXPORT["Conversation export"]
+        SUB["Subagents + Teamwork"]
+        BOOST["Boost (deep reasoning)"]
+    end
+    subgraph Models["Google"]
+        GM["Gemini family<br/>(incl. antigravity-preview)"]
+        CRED["AI credits"]
+    end
+    CLI & DSK & IDE & BR --> CORE
+    CORE --> SUB
+    CORE --> BOOST
+    SYNC -.-> CORE
+    EXPORT -.-> CORE
+    CORE <--> GM
+    CRED -.-> GM
+```
+
+*The distinctive move: one agent core, many surfaces, seamless handoff (a terminal session can be exported to the desktop editor and continue).*
+
 ## Architectural stance
 Antigravity is architecturally the most *ambitious* entry: not a standalone agent but the CLI face of a **platform** ("Antigravity 2.0") built on one shared agent harness. The CLI (v1.x, previously Gemini CLI's lineage) is deliberately lightweight — a keyboard-driven TUI for terminal-first work — while the identical agent core runs in the desktop visual editor, IDE extensions (VS Code, JetBrains, Zed, Xcode), and the Antigravity SDK (for building your own agents with personas, MCP policies, subagents, lifecycle hooks). Google's bet: *one agent brain, many surfaces, seamless handoff.*
 

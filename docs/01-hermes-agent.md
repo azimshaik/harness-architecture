@@ -3,6 +3,60 @@
 **Maker:** Nous Research · **License:** open · **Language:** Python · **Model coupling:** none (any provider)
 **One-liner:** the gateway-first harness that turns an LLM into a *life assistant* — reachable on chat platforms, running on a schedule, with persistent memory.
 
+## Architecture at a glance
+
+```mermaid
+flowchart LR
+    subgraph Users["You (anywhere)"]
+        TG["Telegram"] & WA["WhatsApp"] & DI["Discord"] & SL["Slack"] & CL["CLI"]
+    end
+    subgraph Harness["Hermes (~/.hermes)"]
+        GW["Gateway daemons<br/>per platform"]
+        CORE["Agent core<br/>(per-turn loop)"]
+        MEM[("Memory<br/>state.db + curated<br/>notes, injected")]
+        SK["Skills<br/>(loaded on demand)"]
+        CRON["Cron scheduler<br/>autonomous runs"]
+        SUB["Subagents<br/>(isolated contexts)"]
+        TL["Tools<br/>terminal · files · web ·<br/>vision · email · media"]
+    end
+    subgraph Models["Models (BYO keys)"]
+        M1["DeepSeek"] & M2["Claude"] & M3["OpenRouter"] & M4["Local Ollama"]
+    end
+    TG & WA & DI & SL & CL --> GW
+    GW --> CORE
+    CORE --> TL
+    CORE --> MEM
+    CORE -.-> SK
+    CRON --> CORE
+    CORE --> SUB
+    CORE --> M1 & M2 & M3 & M4
+```
+
+### One turn, end to end
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as User (Telegram)
+    participant G as Gateway
+    participant C as Agent core
+    participant M as Model
+    participant T as Tools
+    U->>G: message
+    G->>C: turn (resolve session/thread)
+    C->>C: assemble context<br/>(memory + skill index + history)
+    C->>M: completion request
+    M-->>C: tool_calls
+    loop tool loop
+        C->>T: execute tool
+        T-->>C: observation
+        C->>M: continue
+        M-->>C: more tool_calls or final
+    end
+    C-->>G: reply
+    G-->>U: message
+```
+
 ## Architectural stance
 Hermes is the odd one out in this set: it is **not repo-centric**. It is **machine- and conversation-centric**. Its home is `~/.hermes/` — a home directory, not a git checkout. It is designed to be a persistent resident of your machine that you talk to from Telegram/WhatsApp/Discord/Slack, that remembers you across sessions, and that acts on your behalf when you're not at the keyboard. Coding is one tool among ~30; life operations (email, calendar, schedules, media, research, home automation) are the point.
 

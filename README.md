@@ -20,6 +20,28 @@ Everyone compares *models*. Almost nobody compares *harnesses* — the loops, co
 
 **Why these four?** They represent the four architectural lineages: the *gateway agent* (Hermes), the *product agent* (Claude Code), the *open agent* (OpenCode), and the *platform agent* (Antigravity — Google's shared harness in CLI form). Together they cover the design space you'll actually meet.
 
+## The landscape
+
+```mermaid
+flowchart LR
+    subgraph Orchestrator["Orchestrator layer"]
+        H["Hermes Agent<br/>gateways · memory · cron · metering"]
+    end
+    subgraph Coders["Repo-agent layer"]
+        CC["Claude Code<br/>(Claude-only)"]
+        OC["OpenCode<br/>(any model)"]
+        AG["Antigravity CLI<br/>(Gemini-only)"]
+    end
+    H -->|"delegates (task brief)"| CC
+    H -->|"delegates (task brief)"| OC
+    H -->|"delegates (task brief)"| AG
+    CC -.->|"compete on the same turf"| OC
+    OC -.->|"compete on the same turf"| AG
+    AG -.->|"compete on the same turf"| CC
+```
+
+*The core thesis of this repo: the three coders fight in a triangle; the orchestrator sits above the fight.*
+
 ## Reading order
 
 1. [01 — Hermes Agent](docs/01-hermes-agent.md) — the gateway-first life assistant
